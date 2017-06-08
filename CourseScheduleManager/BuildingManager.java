@@ -32,7 +32,6 @@ public class BuildingManager implements Serializable {
             if (building.equals(building1)) {
                 for (Classroom classroom : building) {
                     building1.addClassroom(classroom);
-                    classroom.addBuilding(building1);
                     return building1;
                 }
             }

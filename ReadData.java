@@ -94,6 +94,7 @@ public class ReadData {
                         course.addSection(section);
                     }
                 }
+                CourseManager.getInstance().addDepartment(department);
             }
        } catch (JSONException ignored) {
        }

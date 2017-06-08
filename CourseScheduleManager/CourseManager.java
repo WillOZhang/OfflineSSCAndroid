@@ -75,16 +75,23 @@ public class CourseManager implements Serializable {
         return null;
     }
 
-    public String[] getFaculties() {
+    public List<String> getFaculties() {
         List<String> temp = new ArrayList<>();
         for (Department department : departments) {
             if (!temp.contains(department.getFaculty()))
                 temp.add(department.getFaculty());
         }
-        String[] faculties = new String[temp.size()];
-        for (int i = 0; i < temp.size(); i++)
-            faculties[i] = temp.get(i);
-        return faculties;
+        return temp;
+    }
+
+    public List<String> getDepartments(String faculty) {
+        List<String> temp = new ArrayList<>();
+        for (Department department : departments) {
+            if (department.getFaculty().equals(faculty)) {
+                temp.add(faculty + "," + department.getName() + "," + department.getShortName());
+            }
+        }
+        return temp;
     }
 
     public static void setInstance(CourseManager courseManager) {
