@@ -88,10 +88,17 @@ public class CourseManager implements Serializable {
         List<String> temp = new ArrayList<>();
         for (Department department : departments) {
             if (department.getFaculty().equals(faculty)) {
-                temp.add(faculty + "," + department.getName() + "," + department.getShortName());
+                temp.add(faculty + "@" + department.getName() + "@" + department.getShortName());
             }
         }
         return temp;
+    }
+
+    public Department getDepartment(String shortName) {
+        for (Department department : departments)
+            if (department.getShortName().equals(shortName))
+                return department;
+        return null;
     }
 
     public static void setInstance(CourseManager courseManager) {

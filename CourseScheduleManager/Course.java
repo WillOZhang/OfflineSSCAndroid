@@ -1,8 +1,10 @@
 package will.ubccoursemanager.CourseSchedule.CourseScheduleManager;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -81,6 +83,22 @@ public class Course implements Serializable, Iterable<Section> {
             if (section.equals(temp))
                 return section;
         throw new NoSuchElementException();
+    }
+
+    public List<String> getSectionsForDisplay() {
+        List<String> temp = new ArrayList<>();
+        for (Section section : sections) {
+            String a = "section!" + section.getSection() + "@"
+                    + section.getActivity() + "@" +
+                    section.getTerm() + "@";
+            try {
+                a += section.getInstructor().getName();
+            } catch (InstructorTBAException e) {
+                a += "Instructor TBA";
+            }
+            temp.add(a);
+        }
+        return temp;
     }
 
     public boolean sameCourse(Course course) {

@@ -1,8 +1,12 @@
 package will.ubccoursemanager.CourseSchedule.CourseScheduleManager;
 
+import android.widget.ListView;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -65,6 +69,17 @@ public class Department implements Serializable, Iterable<Course> {
 
     public Set<Course> getCourses() {
         return courses;
+    }
+
+    public List<String> getCoursesForDisplay() {
+        List<String> temp = new ArrayList<>();
+        for (Course course : courses) {
+            temp.add("course#" + course.getCourseName() + "@" +
+                    course.getDepartment().getShortName() + "@" +
+                    course.getCourseNumber());
+        }
+        return temp;
+
     }
 
     public String getFaculty() {
