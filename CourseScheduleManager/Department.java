@@ -1,30 +1,36 @@
 package will.ubccoursemanager.CourseSchedule.CourseScheduleManager;
 
+import android.support.annotation.NonNull;
 import android.widget.ListView;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Will on 2017/5/22.
  */
-public class Department implements Serializable, Iterable<Course> {
+public class Department implements Serializable, Iterable<Course>, Comparable<Department> {
     private static final long serialVersionUID = 8759237404882125761L;
     private String shortName;
     private String name;
     private String faculty;
     private Set<Course> courses;
+    private Set<String> courseNumbers;
 
     public Department(String shortName) {
         this.shortName = shortName;
         this.name = "";
         this.faculty = "";
         courses = new HashSet<Course>();
+        courseNumbers = new HashSet<>();
     }
 
     public void setName(String name) {
@@ -73,7 +79,10 @@ public class Department implements Serializable, Iterable<Course> {
 
     public List<String> getCoursesForDisplay() {
         List<String> temp = new ArrayList<>();
-        for (Course course : courses) {
+
+        List<Course> tempCourseList = new ArrayList<>(courses);
+        Collections.sort(tempCourseList);
+        for (Course course : tempCourseList) {
             temp.add("course#" + course.getCourseName() + "@" +
                     course.getDepartment().getShortName() + "@" +
                     course.getCourseNumber());
@@ -88,6 +97,14 @@ public class Department implements Serializable, Iterable<Course> {
 
     public String getName() {
         return name;
+    }
+
+    public Set<String> getCourseNumbers() {
+        return courseNumbers;
+    }
+
+    public void addCourseNumber(String number) {
+        courseNumbers.add(number);
     }
 
     @Override
@@ -108,5 +125,25 @@ public class Department implements Serializable, Iterable<Course> {
     @Override
     public Iterator<Course> iterator() {
         return courses.iterator();
+    }
+
+    @Override
+    public int compareTo(@NonNull Department o) {
+        Pattern l = Pattern.compile("[a-zA-Z]");
+        Matcher m1 = l.matcher(this.shortName);
+        Matcher m2 = l.matcher(o.shortName);
+
+        String s1 = "a";
+        String s2 = "a";
+
+        while (s1.equals(s2)) {
+            if (m1.find() && m2.find()) {
+                s1 = m1.group();
+                s2 = m2.group();
+            } else
+                break;
+        }
+
+        return s1.compareTo(s2);
     }
 }

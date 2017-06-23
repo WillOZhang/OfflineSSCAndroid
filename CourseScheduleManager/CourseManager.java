@@ -2,8 +2,11 @@ package will.ubccoursemanager.CourseSchedule.CourseScheduleManager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -13,6 +16,11 @@ public class CourseManager implements Serializable {
     private Set<Department> departments;
     private static CourseManager instance;
     private static final long serialVersionUID = -3493267914403891417L;
+
+    private Map<String, List<String>> facultyDepartmentPair = new HashMap<>();
+    private Map<String, Set<Department>> facultyDepartmentObjectPair = new HashMap<>();
+
+    private List<String> finishedParseFaculties = new ArrayList<>();
 
     private CourseManager() {
         departments = new HashSet<Department>();
@@ -34,6 +42,7 @@ public class CourseManager implements Serializable {
             }
         }
         departments.add(department);
+        facultyDepartmentObjectPair.get(department.getFaculty()).add(department);
     }
 
     public void addCourse(String course, String number, String name) {
@@ -54,8 +63,22 @@ public class CourseManager implements Serializable {
         return null;
     }
 
+    public void addCourse(Department department, Course course) {
+        for (Department next : departments)
+            if (department.equals(next))
+                next.addCourse(course);
+    }
+
     public Set<Department> getDepartments() {
         return departments;
+    }
+
+    public Set<Department> getDepartmentSetByFaculty(String faculty) {
+        Set<Department> temp = new HashSet<>();
+        for (Department department : departments)
+            if (department.getFaculty().equals(faculty))
+                temp.add(department);
+        return temp;
     }
 
     public void print() {
@@ -86,19 +109,56 @@ public class CourseManager implements Serializable {
 
     public List<String> getDepartments(String faculty) {
         List<String> temp = new ArrayList<>();
+        List<Department> tempDepartment = new ArrayList<>(facultyDepartmentObjectPair.get(faculty));
+        Collections.sort(tempDepartment);
+        for (Department department : tempDepartment) {
+            temp.add(faculty + "@" + department.getName() + "@" + department.getShortName());
+        }
+        if (!finishedParseFaculties.contains(faculty))
+            finishedParseFaculties.add(faculty);
+        return temp;
+    }
+
+    public List<String> getFinishedParseFaculties() {
+        return finishedParseFaculties;
+    }
+
+    public Department getDepartment(String shortName) {
+        Department temp = null;
         for (Department department : departments) {
-            if (department.getFaculty().equals(faculty)) {
-                temp.add(faculty + "@" + department.getName() + "@" + department.getShortName());
+            if (department.getShortName().equals(shortName)) {
+                temp = department;
+                break;
             }
         }
         return temp;
     }
 
-    public Department getDepartment(String shortName) {
-        for (Department department : departments)
-            if (department.getShortName().equals(shortName))
-                return department;
-        return null;
+    public void addFDPair(String faculty, List<String> department) {
+        facultyDepartmentPair.put(faculty, department);
+        Set<Department> temp = facultyDepartmentObjectPair.get(faculty);
+        if (temp == null)
+            facultyDepartmentObjectPair.put(faculty, new HashSet<Department>());
+    }
+
+    public List<String> getDepartmentsByFaculty(String faculty) {
+        return facultyDepartmentPair.get(faculty);
+    }
+
+    public List<String> getCoursesByDepartment(Department department) {
+        List<String> temp = new ArrayList<>();
+        for (String number : department.getCourseNumbers()) {
+            temp.add(department.getShortName() + number);
+        }
+        return temp;
+    }
+
+    public List<String> getSectionsByCourse(Course course) {
+        List<String> temp = new ArrayList<>();
+        for (String section : course.getSectionsList()) {
+            temp.add(course.getDepartment().getShortName() + course.getCourseNumber() + section);
+        }
+        return temp;
     }
 
     public static void setInstance(CourseManager courseManager) {

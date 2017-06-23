@@ -56,6 +56,8 @@ public class ReadData {
                     for (int sectionIndex = 0; sectionIndex < sectionJsonArray.length(); sectionIndex++) {
 
                         JSONObject sectionJson = sectionJsonArray.getJSONObject(sectionIndex);
+                        // section json should equal to the according path
+
                         Section section = new Section(course, sectionJson.getString("section"), sectionJson.getString("status"),
                                 sectionJson.getString("activity"), null, null, sectionJson.getString("term"));
 

@@ -1,12 +1,17 @@
 package will.ubccoursemanager.CourseSchedule.CourseScheduleManager;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import will.ubccoursemanager.CourseSchedule.CourseScheduleManager.Exceptions.InstructorTBAException;
 import will.ubccoursemanager.CourseSchedule.CourseScheduleManager.Exceptions.NoScheduledMeetingException;
@@ -14,7 +19,7 @@ import will.ubccoursemanager.CourseSchedule.CourseScheduleManager.Exceptions.NoS
 /**
  * Created by Will on 2017/5/20.
  */
-public class Course implements Serializable, Iterable<Section> {
+public class Course implements Serializable, Iterable<Section>, Comparable<Course> {
     private Department department;
     private String courseNumber;
     private String courseName;
@@ -22,6 +27,7 @@ public class Course implements Serializable, Iterable<Section> {
     private String credits;
     private String reqs;
     private Set<Section> sections;
+    private List<String> sectionsList;
 
     private Set<Instructor> instructorsWhoOfferThisCourse;
     private Set<Classroom> classrooms;
@@ -34,10 +40,19 @@ public class Course implements Serializable, Iterable<Section> {
         this.credits = "Credits: 3";
 
         sections = new HashSet<Section>();
+        sectionsList = new ArrayList<>();
         instructorsWhoOfferThisCourse = new HashSet<Instructor>();
         classrooms = new HashSet<Classroom>();
 
         department.addCourse(this);
+    }
+
+    public List<String> getSectionsList() {
+        return sectionsList;
+    }
+
+    public void addSection(String section) {
+        sectionsList.add(section);
     }
 
     public void setCredits(String credits) {
@@ -87,7 +102,9 @@ public class Course implements Serializable, Iterable<Section> {
 
     public List<String> getSectionsForDisplay() {
         List<String> temp = new ArrayList<>();
-        for (Section section : sections) {
+        List<Section> tempSection = new ArrayList<>(sections);
+        Collections.sort(tempSection);
+        for (Section section : tempSection) {
             String a = "section!" + section.getSection() + "@"
                     + section.getActivity() + "@" +
                     section.getTerm() + "@";
@@ -192,5 +209,56 @@ public class Course implements Serializable, Iterable<Section> {
     @Override
     public Iterator<Section> iterator() {
         return sections.iterator();
+    }
+
+    @Override
+    public int compareTo(@NonNull Course o) {
+        Pattern pattern = Pattern.compile("[a-zA-Z]*");
+        Pattern number = Pattern.compile("\\d*");
+
+        Matcher thisCourseNumLetter = pattern.matcher(this.courseNumber);
+        Matcher thisCourseNumber = number.matcher(this.courseNumber);
+
+        Matcher oCourseNumLetter = pattern.matcher(o.courseNumber);
+        Matcher oCourseNumber = number.matcher(o.courseNumber);
+
+        String s1 = null;
+        String s2 = null;
+
+        while (thisCourseNumLetter.find())
+            s1 = thisCourseNumLetter.group();
+        while (oCourseNumLetter.find())
+            s2 = oCourseNumLetter.group();
+
+        int i1 = 0;
+        int i2 = 0;
+
+        while (thisCourseNumber.find()) {
+            String temp = thisCourseNumber.group();
+            if (!temp.isEmpty())
+                i1 = Integer.parseInt(temp);
+        }
+        while (oCourseNumber.find()) {
+            String temp = oCourseNumber.group();
+            if (!temp.isEmpty())
+                i2 = Integer.parseInt(temp);
+        }
+
+        if (s1 == null && s2 == null)
+            return i1 - i2;
+        else if (s1 != null && s2 != null) {
+            if (i1 - i2 == 0)
+                return s1.compareTo(s2);
+            else
+                return i1 - i2;
+        } else {
+            if (i1 - i2 == 0) {
+                if (s1 == null)
+                    return "Z".compareTo(s2);
+                else
+                    return s1.compareTo("Z");
+            } else
+                return i1 - i2;
+        }
     }
 }

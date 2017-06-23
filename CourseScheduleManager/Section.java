@@ -1,8 +1,12 @@
 package will.ubccoursemanager.CourseSchedule.CourseScheduleManager;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.sql.Time;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import will.ubccoursemanager.CourseSchedule.CourseScheduleManager.Exceptions.InstructorTBAException;
 import will.ubccoursemanager.CourseSchedule.CourseScheduleManager.Exceptions.NoScheduledMeetingException;
@@ -10,7 +14,7 @@ import will.ubccoursemanager.CourseSchedule.CourseScheduleManager.Exceptions.NoS
 /**
  * Created by Will on 2017/5/22.
  */
-public class Section implements Serializable {
+public class Section implements Serializable, Comparable<Section> {
     private Course course;
     private String section, status, activity;
     private Set<String> days;
@@ -172,5 +176,71 @@ public class Section implements Serializable {
 
     public void setTimeMap(Map<String, List<Time>> timeMap) {
         this.timeMap = timeMap;
+    }
+
+    @Override
+    public int compareTo(@NonNull Section o) {
+        // TODO: find a better way to compare sections
+        // worth to try
+
+//        Pattern p1 = Pattern.compile("\\d+");
+//        Pattern p2 = Pattern.compile("(\\d+)([a-zA-Z])");
+//        Pattern p3 = Pattern.compile("([a-zA-Z])(\\d+)");
+//        Pattern p4 = Pattern.compile("([a-zA-Z])(\\d+)([a-zA-Z])");
+//
+//        Matcher tm1 = p1.matcher(this.section);
+//        if (tm1.find()) { // TODO: L1E can also be true under this condistion
+//            Matcher om1 = p1.matcher(o.section);
+//            if (om1.find()) {
+//                return Integer.parseInt(tm1.group()) - Integer.parseInt(om1.group());
+//            }
+//        }
+
+
+
+        Pattern pattern = Pattern.compile("[a-zA-Z]*");
+        Pattern number = Pattern.compile("\\d*");
+
+        Matcher thisCourseNumLetter = pattern.matcher(this.section);
+        Matcher thisCourseNumber = number.matcher(this.section);
+
+        Matcher oCourseNumLetter = pattern.matcher(o.section);
+        Matcher oCourseNumber = number.matcher(o.section);
+
+        String s1 = null;
+        String s2 = null;
+
+        while (thisCourseNumLetter.find())
+            s1 = thisCourseNumLetter.group();
+        while (oCourseNumLetter.find())
+            s2 = oCourseNumLetter.group();
+
+        int i1 = 0;
+        int i2 = 0;
+
+        while (thisCourseNumber.find()) {
+            String temp = thisCourseNumber.group();
+            if (!temp.isEmpty())
+                i1 = Integer.parseInt(temp);
+        }
+        while (oCourseNumber.find()) {
+            String temp = oCourseNumber.group();
+            if (!temp.isEmpty())
+                i2 = Integer.parseInt(temp);
+        }
+
+        if (s1 == null && s2 == null)
+            return i1 - i2;
+        else if (s1 != null && s2 != null) {
+            if (s1.equals(s2))
+                return i1 - i2;
+            else
+                return s1.compareTo(s2);
+        } else {
+            if (s1 == null)
+                return 0;
+            else
+                return i1;
+        }
     }
 }
