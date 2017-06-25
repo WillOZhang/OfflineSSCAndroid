@@ -45,6 +45,16 @@ public class CourseManager implements Serializable {
         facultyDepartmentObjectPair.get(department.getFaculty()).add(department);
     }
 
+    public void addDepartmentForDownloadData(Department department) {
+        for (Department department1 : departments){
+            if (department.equals(department1)) {
+                department1.changeToSameDepartment(department);
+                return;
+            }
+        }
+        departments.add(department);
+    }
+
     public void addCourse(String course, String number, String name) {
         Department temp = new Department(course);
         for (Department department : departments) {
