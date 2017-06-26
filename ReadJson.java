@@ -84,6 +84,16 @@ public class ReadJson {
             Section section = new Section(course, sectionJson.getString("section"), sectionJson.getString("status"),
                     sectionJson.getString("activity"), null, null, sectionJson.getString("term"));
 
+            int total = sectionJson.getInt("total");
+            int current = sectionJson.getInt("current");
+            int general = sectionJson.getInt("general");
+            int restricted = sectionJson.getInt("restrict");
+            String restrictedTo = sectionJson.getString("restrictedTo");
+            String withrawDay = sectionJson.getString("withrawDay");
+            section.setSeatsInfo(total,current,restricted,general);
+            section.setRestrictTo(restrictedTo);
+            section.setLastWithdraw(withrawDay);
+
             try {
                 String classroomName = sectionJson.getString("classroom");
                 Building building = new Building(sectionJson.getString("building"));

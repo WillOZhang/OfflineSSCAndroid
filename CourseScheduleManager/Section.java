@@ -23,6 +23,9 @@ public class Section implements Serializable, Comparable<Section> {
     private Time start, end;
     private String term;
     private Map<String, List<Time>> timeMap;
+    private int totalSeats, currentRegistered, restrictSeats, generalSeats;
+    private String restrictTo;
+    private String lastWithdraw;
 
     public Section(Course course, String section, String status, String activity,
                    Instructor instructorName, Classroom classroom,
@@ -34,6 +37,7 @@ public class Section implements Serializable, Comparable<Section> {
         this.instructor = instructorName;
         this.classroom = classroom;
         this.term = term;
+        this.restrictTo = "";
         timeMap = new HashMap<String, List<Time>>();
         days = new HashSet<>();
 
@@ -51,6 +55,21 @@ public class Section implements Serializable, Comparable<Section> {
         BuildingManager.getInstance().getBuilding(classroom.getBuildingThatThisClassroomAt());
         this.classroom = classroom;
         course.addSection(this);
+    }
+
+    public void setSeatsInfo(int totalSeats, int currentRegistered, int restrictSeats, int generalSeats) {
+        this.totalSeats = totalSeats;
+        this.currentRegistered = currentRegistered;
+        this.restrictSeats = restrictSeats;
+        this.generalSeats = generalSeats;
+    }
+
+    public void setRestrictTo(String restrictTo) {
+        this.restrictTo = restrictTo;
+    }
+
+    public void setLastWithdraw(String lastWithdraw) {
+        this.lastWithdraw = lastWithdraw;
     }
 
     public void addTime(String days, Time start, Time end) {
@@ -72,6 +91,12 @@ public class Section implements Serializable, Comparable<Section> {
         this.status = section.getStatus();
         this.activity = section.getActivity();
         this.term = section.getTerm();
+        this.totalSeats = section.totalSeats;
+        this.currentRegistered = section.currentRegistered;
+        this.restrictSeats = section.restrictSeats;
+        this.generalSeats = section.generalSeats;
+        this.restrictTo = section.restrictTo;
+        this.lastWithdraw = section.lastWithdraw;
         try {
             this.days = section.getDays();
             this.classroom = section.getClassroom();
@@ -168,6 +193,30 @@ public class Section implements Serializable, Comparable<Section> {
                     System.out.println("\t &Time: " + time.toString() + "&");
             }
         }
+    }
+
+    public int getTotalSeats() {
+        return totalSeats;
+    }
+
+    public int getCurrentRegistered() {
+        return currentRegistered;
+    }
+
+    public int getRestrictSeats() {
+        return restrictSeats;
+    }
+
+    public int getGeneralSeats() {
+        return generalSeats;
+    }
+
+    public String getRestrictTo() {
+        return restrictTo;
+    }
+
+    public String getLastWithdraw() {
+        return lastWithdraw;
     }
 
     public void setDays(Set<String> days) {

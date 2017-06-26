@@ -113,6 +113,10 @@ public class Course implements Serializable, Iterable<Section>, Comparable<Cours
             } catch (InstructorTBAException e) {
                 a += "Instructor TBA";
             }
+            a = a + "@" + Integer.toString(section.getTotalSeats()) + "@" +
+                    Integer.toString(section.getCurrentRegistered()) + "@" +
+                    Integer.toString(section.getGeneralSeats()) + "@" +
+                    Integer.toString(section.getRestrictSeats()) + "@";
             temp.add(a);
         }
         return temp;
